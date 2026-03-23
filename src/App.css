@@ -92,6 +92,25 @@ main {
   border-radius: 30px;
   cursor: pointer;
 }
+.error-message {
+  background: rgba(255, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  color: #ffcccc;
+  padding: 15px 25px;
+  border-radius: 15px;
+  margin-top: 20px;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.welcome-text {
+  color: white;
+  font-size: 20px;
+  margin-top: 50px;
+  opacity: 0.8;
+}
 
 .main-card {
   background: rgba(255, 255, 255, 0.05);
@@ -214,5 +233,57 @@ main {
     flex-direction: row;
     justify-content: center;
     gap: 20px;
+  }
+}
+/* Suggestion Buttons */
+.suggestions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.suggestions button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.suggestions button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Error Box */
+.error-box {
+  background: rgba(255, 87, 87, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 87, 87, 0.4);
+  margin-top: 20px;
+  color: #ffbaba;
+  font-weight: 600;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Mobile Fixes */
+@media screen and (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .current-temp {
+    font-size: 80px;
   }
 }

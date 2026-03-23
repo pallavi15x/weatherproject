@@ -10,13 +10,24 @@ function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState({});
   const [units, setUnits] = useState('metric');
+  const [error, setError] = useState('');
 
   const fetchWeather = (url) => {
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw Error("City not found. Try a specific city like 'Jaipur' or 'Lucknow'.");
+        }
+        return res.json();
+      })
       .then(result => {
         setWeather(result);
         setQuery('');
+        setError('');
+      })
+      .catch(err => {
+        setError(err.message);
+        // We keep the old weather data or clear it based on preference
       });
   }
 
@@ -24,57 +35,63 @@ function App() {
     navigator.geolocation.getCurrentPosition((pos) => {
       fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`);
     }, () => {
-      fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`);
+      fetchWeather(`${API.base}weather?q=Jaipur&units=${units}&APPID=${API.key}`);
     });
   }, [units]);
 
-  const search = evt => {
-    if (evt.key === "Enter" || evt.type === "click") {
-      fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`);
-    }
+  const search = (city) => {
+    const target = typeof city === 'string' ? city : query;
+    if (target.trim() === "") return;
+    fetchWeather(`${API.base}weather?q=${target}&units=${units}&APPID=${API.key}`);
   }
 
-  // FIXED: Removed the double declaration and fixed braces
+  const handleKey = evt => {
+    if (evt.key === "Enter") search();
+  }
+
   const getBG = () => {
     if (!weather.main) return 'app';
+    const tempInC = units === 'metric' ? weather.main.temp : (weather.main.temp - 32) * (5/9);
+    if (tempInC > 30) return 'app hot';
     
-    const tempInCelsius = units === 'metric' ? weather.main.temp : (weather.main.temp - 32) * (5/9);
-
-    // 1. Temperature Priority (Hot background for Rajasthan style heat)
-    if (tempInCelsius > 30) return 'app hot';
-    
-    // 2. Secondary: Condition Priority
     const main = weather.weather[0].main.toLowerCase();
-    if (main.includes('rain')) return 'app rainy';
     if (main.includes('cloud')) return 'app cloudy';
+    if (main.includes('rain')) return 'app rainy';
     if (main.includes('clear')) return 'app sunny';
-    if (main.includes('mist') || main.includes('haze')) return 'app misty';
-    
     return 'app';
   }
 
   return (
     <div className={getBG()}>
       <main>
-        <div className="search-container">
-          <input 
-            type="text"
-            className="search-bar"
-            placeholder="Search city..."
-            onChange={e => setQuery(e.target.value)}
-            value={query}
-            onKeyPress={search}
-          />
-          <button className="search-btn" onClick={search}>Search</button>
+        <div className="search-section">
+          <div className="search-container">
+            <input 
+              type="text"
+              className="search-bar"
+              placeholder="Search city (e.g. Patna, Lucknow)..."
+              onChange={e => setQuery(e.target.value)}
+              value={query}
+              onKeyPress={handleKey}
+            />
+            <button className="search-btn" onClick={() => search()}>Search</button>
+          </div>
+
+          <div className="suggestions">
+            <button onClick={() => search('Jaipur')}>Rajasthan</button>
+            <button onClick={() => search('Lucknow')}>UP</button>
+            <button onClick={() => search('Patna')}>Bihar</button>
+            <button onClick={() => search('Mumbai')}>MH</button>
+          </div>
         </div>
+
+        {error && <div className="error-box">{error}</div>}
         
         {weather.main && (
           <div className="content-wrapper animate-fade-in">
             <div className="header-section">
               <h1 className="location">{weather.name}, {weather.sys.country}</h1>
-              <p className="date-display">
-                {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
+              <p className="date-display">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
               <button className="unit-badge" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
                 {units === 'metric' ? '°C' : '°F'}
               </button>
@@ -84,11 +101,7 @@ function App() {
               <div className="temp-section">
                 <span className="current-temp">{Math.round(weather.main.temp)}°</span>
                 <div className="condition">
-                  <img 
-                    className="weather-icon" 
-                    src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} 
-                    alt="icon" 
-                  />
+                  <img className="weather-icon" src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
                   <p>{weather.weather[0].description}</p>
                 </div>
               </div>
@@ -107,8 +120,8 @@ function App() {
                   <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
                 </div>
                 <div className="stat-item">
-                  <label>PRESSURE</label>
-                  <p>{weather.main.pressure} <span>hPa</span></p>
+                  <label>VISIBILITY</label>
+                  <p>{(weather.visibility / 1000).toFixed(1)} <span>km</span></p>
                 </div>
               </div>
             </div>
