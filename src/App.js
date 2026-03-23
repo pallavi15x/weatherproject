@@ -12,31 +12,24 @@ function App() {
   const [units, setUnits] = useState('metric');
   const [history, setHistory] = useState(JSON.parse(localStorage.getItem('searchHistory')) || []);
   const [error, setError] = useState('');
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Live Clock logic
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const fetchWeather = (url, cityName) => {
     fetch(url)
       .then(res => {
-        if (!res.ok) throw Error("Location not found");
+        if (!res.ok) throw Error("Location unavailable");
         return res.json();
       })
       .then(result => {
         setWeather(result);
         if (cityName && !history.includes(cityName)) {
-          const newHistory = [cityName, ...history.filter(h => h !== cityName)].slice(0, 6);
+          const newHistory = [cityName, ...history.filter(h => h !== cityName)].slice(0, 4);
           setHistory(newHistory);
           localStorage.setItem('searchHistory', JSON.stringify(newHistory));
         }
         setQuery('');
         setError('');
       })
-      .catch(() => setError("City not found. Try 'Jaipur'"));
+      .catch(() => setError("City not found."));
   }
 
   useEffect(() => {
@@ -46,101 +39,89 @@ function App() {
     );
   }, [units]);
 
-  const getGreeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  }
+  // Logic for the "Comfort Index"
+  const getComfortLevel = () => {
+    if (!weather.main) return "Stable";
+    const hum = weather.main.humidity;
+    if (hum > 70) return "Humid";
+    if (hum < 30) return "Dry Air";
+    return "Pleasant";
+  };
 
-  const getThemeClass = () => {
-    if (!weather.main) return 'app-container default';
-    const condition = weather.weather[0].main;
-    if (condition === 'Clear') return 'app-container sun-theme';
-    if (condition === 'Clouds') return 'app-container cloud-theme';
-    if (condition === 'Rain' || condition === 'Drizzle') return 'app-container rain-theme';
-    return 'app-container default';
-  }
+  const getTimeTheme = () => {
+    const hour = new Date().getHours();
+    if (hour < 6 || hour > 18) return 'night-mode';
+    return 'day-mode';
+  };
 
   return (
-    <div className={getThemeClass()}>
-      <div className="dashboard-wrapper">
-        
-        {/* LEFT SIDEBAR: History & Branding */}
-        <aside className="glass-sidebar">
-          <div className="brand-zone">
-            <h2>SkyCast<span>.io</span></h2>
-            <p>{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+    <div className={`quantum-container ${getTimeTheme()}`}>
+      {/* Background Animated Orbs */}
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+      
+      <div className="glass-canvas">
+        <aside className="smart-dock">
+          <div className="dock-logo">Ω</div>
+          <div className="dock-nav">
+            {history.map((city, i) => (
+              <button key={i} className="dock-btn" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
+                {city.substring(0, 2).toUpperCase()}
+              </button>
+            ))}
           </div>
-
-          <div className="history-zone">
-            <label>Recent Places</label>
-            <div className="history-list">
-              {history.map((city, i) => (
-                <button key={i} className="history-item" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
-                  <i className="fas fa-map-marker-alt"></i> {city}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="sidebar-footer">
-            <button className="unit-toggle-btn" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
-              Switch to {units === 'metric' ? '°F' : '°C'}
-            </button>
-          </div>
+          <button className="unit-swap" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
+            {units === 'metric' ? '°C' : '°F'}
+          </button>
         </aside>
 
-        {/* MAIN CONTENT AREA */}
-        <main className="main-content">
-          <header className="glass-header">
-            <div className="greeting-text">
-              <h3>{getGreeting()}</h3>
-              <p>Explore the world's weather</p>
-            </div>
-            <div className="search-bar-v3">
-              <input 
-                type="text" placeholder="Search another city..." 
-                value={query} onChange={e => setQuery(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
-              />
-              <button onClick={() => fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}>Search</button>
-            </div>
-          </header>
-
-          {error && <div className="error-toast">{error}</div>}
+        <main className="viewport">
+          <div className="search-v5">
+            <input 
+              type="text" placeholder="Jump to City..." 
+              value={query} onChange={e => setQuery(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
+            />
+            <div className="search-glow"></div>
+          </div>
 
           {weather.main && (
-            <div className="weather-display animate-fade-up">
-              <div className="hero-weather">
-                <div className="hero-text">
-                  <h1 className="main-location">{weather.name}, {weather.sys.country}</h1>
-                  <span className="weather-desc">{weather.weather[0].description}</span>
+            <div className="scene animate-reveal">
+              <section className="hero-data">
+                <div className="badge-row">
+                  <span className="live-badge">LIVE</span>
+                  <span className="comfort-badge">{getComfortLevel()}</span>
                 </div>
-                <div className="hero-temp">
-                  <span className="big-degree">{Math.round(weather.main.temp)}°</span>
-                  <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="weather-icon" />
+                <h1 className="city-title">{weather.name}</h1>
+                <div className="main-temp-wrap">
+                  <h2 className="temp-num">{Math.round(weather.main.temp)}<span className="degree-symbol">°</span></h2>
+                  <div className="temp-meta">
+                    <p className="desc-text">{weather.weather[0].description}</p>
+                    <p className="range-text">H: {Math.round(weather.main.temp_max)}° L: {Math.round(weather.main.temp_min)}°</p>
+                  </div>
                 </div>
-              </div>
+              </section>
 
-              <div className="data-grid-v3">
-                <div className="glass-tile">
-                  <label>Feels Like</label>
-                  <p>{Math.round(weather.main.feels_like)}°</p>
+              <section className="bento-grid">
+                <div className="bento-item wind">
+                  <label>Wind Flow</label>
+                  <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
+                  <div className="wind-indicator" style={{transform: `rotate(${weather.wind.deg}deg)`}}>↑</div>
                 </div>
-                <div className="glass-tile">
+                <div className="bento-item humidity">
                   <label>Humidity</label>
                   <p>{weather.main.humidity}%</p>
+                  <div className="bar-container"><div className="bar-fill" style={{width: `${weather.main.humidity}%`}}></div></div>
                 </div>
-                <div className="glass-tile">
-                  <label>Wind Speed</label>
-                  <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
-                </div>
-                <div className="glass-tile">
+                <div className="bento-item pressure">
                   <label>Pressure</label>
-                  <p>{weather.main.pressure} <span>hPa</span></p>
+                  <p>{weather.main.pressure}<span>hPa</span></p>
                 </div>
-              </div>
+                <div className="bento-item visibility">
+                  <label>Visibility</label>
+                  <p>{(weather.visibility / 1000).toFixed(1)}<span>km</span></p>
+                </div>
+              </section>
             </div>
           )}
         </main>

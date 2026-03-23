@@ -1,130 +1,351 @@
 /* ==========================================================================
-   TITAN THEME ENGINE (Animated Backgrounds)
+   1. CORE SETUP & TYPOGRAPHY
    ========================================================================== */
-.app-container {
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;600;800&family=Syncopate:wght@700&display=swap');
+
+:root {
+  --neon-blue: #00d2ff;
+  --neon-purple: #9d50bb;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --accent-white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  font-family: 'Outfit', sans-serif;
+  overflow: hidden; /* Keeps the app feeling like a single-page OS */
+}
+
+/* ==========================================================================
+   2. IMMERSIVE BACKGROUND (ORBS & NEBULA)
+   ========================================================================== */
+.quantum-container {
   min-height: 100vh;
-  background-size: 400% 400%;
-  animation: liquidGradient 12s ease infinite;
+  width: 100vw;
   display: flex;
-  color: white;
-  overflow: hidden;
-}
-
-@keyframes liquidGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.default { background-image: linear-gradient(-45deg, #2c3e50, #000000, #4ca1af); }
-.sun-theme { background-image: linear-gradient(-45deg, #2193b0, #6dd5ed, #ff9966, #ff5e62); }
-.cloud-theme { background-image: linear-gradient(-45deg, #bdc3c7, #2c3e50, #757f9a, #d7d2cc); }
-.rain-theme { background-image: linear-gradient(-45deg, #141e30, #243b55, #000428, #004e92); }
-
-/* DASHBOARD LAYOUT */
-.dashboard-wrapper {
-  display: flex;
-  width: 100%;
-  padding: 25px;
-  gap: 25px;
-}
-
-/* LEFT SIDEBAR GLASS */
-.glass-sidebar {
-  width: 320px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 35px;
-  display: flex;
-  flex-direction: column;
-  padding: 40px 25px;
-}
-
-.brand-zone h2 { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
-.brand-zone span { color: #00f2ff; }
-.brand-zone p { opacity: 0.5; font-size: 13px; margin-top: 5px; }
-
-.history-zone { margin-top: 60px; flex: 1; }
-.history-zone label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.4; }
-.history-list { margin-top: 15px; }
-
-.history-item {
-  width: 100%; text-align: left; background: rgba(255,255,255,0.03); 
-  border: 1px solid transparent; color: white; padding: 12px 18px;
-  border-radius: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;
-}
-.history-item:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: scale(1.02); }
-
-/* MAIN SECTION */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.glass-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  justify-content: center;
+  position: relative;
+  transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.search-bar-v3 {
-  background: rgba(255,255,255,0.1);
-  padding: 5px 5px 5px 20px;
-  border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.2);
+/* Animated Floating Orbs */
+.orb {
+  position: absolute;
+  filter: blur(100px);
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.5;
+  animation: floatOrb 25s infinite alternate ease-in-out;
+}
+
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--neon-blue);
+  top: -10%;
+  left: -5%;
+}
+
+.orb-2 {
+  width: 600px;
+  height: 600px;
+  background: var(--neon-purple);
+  bottom: -10%;
+  right: -5%;
+  animation-delay: -7s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(150px, 80px) scale(1.1); }
+}
+
+/* Theme Shifts */
+.day-mode { background: #0a0a0a; }
+.night-mode { background: #000000; }
+.night-mode .orb-1 { background: #1e3a8a; }
+
+/* ==========================================================================
+   3. THE GLASS CANVAS (MAIN WRAPPER)
+   ========================================================================== */
+.glass-canvas {
+  width: 94vw;
+  height: 90vh;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(40px);
+  border: 1px solid var(--glass-border);
+  border-radius: 40px;
   display: flex;
-  width: 100%;
-  max-width: 450px;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
 }
-.search-bar-v3 input { background: transparent; border: none; color: white; outline: none; flex: 1; }
-.search-bar-v3 button { background: white; border: none; padding: 10px 25px; border-radius: 100px; font-weight: 700; cursor: pointer; }
 
-/* HERO WEATHER DISPLAY */
-.weather-display { margin-top: auto; margin-bottom: auto; }
-.main-location { font-size: 64px; font-weight: 800; }
-.weather-desc { font-size: 24px; opacity: 0.6; text-transform: capitalize; }
+/* SMART DOCK (Left Side) */
+.smart-dock {
+  width: 90px;
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  gap: 35px;
+}
 
-.hero-temp { display: flex; align-items: center; gap: 20px; margin-top: 20px; }
-.big-degree { 
-  font-size: 180px; font-weight: 900; 
-  background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.4));
+.dock-logo {
+  font-family: 'Syncopate', sans-serif;
+  font-size: 32px;
+  background: linear-gradient(to bottom, #fff, #444);
   background-clip: text;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* DATA TILE GRID */
-.data-grid-v3 {
+.dock-btn {
+  width: 50px;
+  height: 50px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.dock-btn:hover {
+  background: white;
+  color: black;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+}
+
+.unit-swap {
+  margin-top: auto;
+  background: transparent;
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   4. VIEWPORT & CONTENT
+   ========================================================================== */
+.viewport {
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Search Interface */
+.search-v5 {
+  position: relative;
+  max-width: 550px;
+  margin-bottom: 50px;
+}
+
+.search-v5 input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--glass-border);
+  padding: 15px 0;
+  font-size: 24px;
+  color: white;
+  outline: none;
+  font-weight: 300;
+  transition: 0.4s;
+}
+
+.search-v5 input:focus {
+  border-bottom-color: white;
+  letter-spacing: 1px;
+}
+
+/* Hero Data Display */
+.badge-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.live-badge {
+  background: #ff3b30;
+  color: white;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.comfort-badge {
+  background: rgba(255,255,255,0.1);
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+}
+
+.city-title {
+  font-size: 72px;
+  font-weight: 300;
+  margin-bottom: 10px;
+  letter-spacing: -3px;
+}
+
+.main-temp-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+}
+
+.temp-num {
+  font-size: 200px;
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -12px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.degree-symbol {
+  font-weight: 100;
+  color: rgba(255,255,255,0.2);
+}
+
+.temp-meta p {
+  font-size: 20px;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+}
+
+.range-text {
+  opacity: 0.4;
+  font-weight: 300;
+}
+
+/* ==========================================================================
+   5. BENTO GRID DATA TILES
+   ========================================================================== */
+.bento-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-top: 60px;
+  margin-top: auto;
 }
-.glass-tile {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  padding: 30px 20px;
-  border-radius: 30px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-.glass-tile label { font-size: 11px; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 10px; }
-.glass-tile p { font-size: 32px; font-weight: 700; }
-.glass-tile span { font-size: 14px; opacity: 0.4; font-weight: 400; }
 
-/* ANIMATIONS */
-.animate-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+.bento-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  padding: 30px;
+  border-radius: 35px;
+  transition: 0.4s;
+}
+
+.bento-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-10px);
+}
+
+.bento-item label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.4;
+  display: block;
+}
+
+.bento-item p {
+  font-size: 32px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.bento-item span {
+  font-size: 14px;
+  opacity: 0.4;
+  margin-left: 5px;
+}
+
+.wind-indicator {
+  font-size: 28px;
+  margin-top: 15px;
+  color: var(--neon-blue);
+}
+
+.bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--neon-blue), #fff);
+  border-radius: 10px;
+  transition: width 1s ease-out;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE OPTIMIZATION
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .temp-num { font-size: 140px; }
+  .city-title { font-size: 50px; }
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .glass-canvas {
+    flex-direction: column;
+    height: auto;
+    width: 95vw;
+    margin: 20px 0;
+  }
+  .smart-dock {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 20px;
+    justify-content: center;
+  }
+  .viewport { padding: 30px; }
+  .temp-num { font-size: 100px; }
+  .bento-grid { grid-template-columns: 1fr; }
+}
+
+/* Entry Animation */
+.animate-reveal {
+  animation: revealUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(50px); filter: blur(20px); }
   to { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-
-/* MOBILE RESPONSIVE */
-@media (max-width: 1024px) {
-  .dashboard-wrapper { flex-direction: column; overflow-y: auto; }
-  .glass-sidebar { width: 100%; order: 2; }
-  .main-content { order: 1; }
-  .data-grid-v3 { grid-template-columns: repeat(2, 1fr); }
-  .big-degree { font-size: 100px; }
 }
