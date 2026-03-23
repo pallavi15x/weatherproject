@@ -29,89 +29,101 @@ function App() {
         setQuery('');
         setError('');
       })
-      .catch(() => setError("Location Error"));
+      .catch(() => setError("Location not found"));
   }
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`),
-      () => fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`)
+      () => fetchWeather(`${API.base}weather?q=New York&units=${units}&APPID=${API.key}`)
     );
   }, [units]);
 
+  const getIcon = (code) => `https://openweathermap.org/img/wn/${code}@4x.png`;
+
   return (
-    <div className="app-viewport">
-      <div className="bg-glow"></div>
+    <div className="app-container">
+      <div className="dynamic-bg-glow"></div>
       
-      <div className="main-wrapper">
-        {/* REFINED SIDEBAR */}
-        <nav className="side-dock">
-          <div className="app-logo">Ω</div>
-          <div className="nav-history">
+      <div className="glass-interface">
+        {/* SIDEBAR NAVIGATION */}
+        <aside className="sidebar">
+          <div className="brand-logo">Ω</div>
+          <div className="history-stack">
             {history.map((city, i) => (
-              <button key={i} className="nav-item" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
-                {city.charAt(0)}
+              <button key={i} className="history-btn" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
+                {city.charAt(0).toUpperCase()}
               </button>
             ))}
           </div>
-          <button className="unit-toggle" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
+          <button className="unit-fab" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
             {units === 'metric' ? '°C' : '°F'}
           </button>
-        </nav>
+        </aside>
 
-        {/* MAIN VIEWPORT */}
-        <section className="display-area">
-          <header className="header-bar">
-            <div className="search-field">
+        {/* MAIN DASHBOARD */}
+        <main className="dashboard">
+          <header className="search-section">
+            <div className="input-group">
               <input 
-                type="text" placeholder="Search City..." 
+                type="text" placeholder="Explore City..." 
                 value={query} onChange={e => setQuery(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
               />
-              <span className="search-focus-line"></span>
+              <div className="focus-border"></div>
             </div>
+            {error && <p className="error-msg">{error}</p>}
           </header>
 
           {weather.main && (
-            <div className="data-layout animate-fade">
-              <div className="hero-data">
-                <div className="status-tags">
-                  <span className="tag-live">LIVE</span>
-                  <span className="tag-desc">{weather.weather[0].main}</span>
+            <div className="content-reveal">
+              <section className="hero-weather">
+                <div className="tag-row">
+                  <span className="badge-live">LIVE</span>
+                  <span className="badge-type">{weather.weather[0].main}</span>
                 </div>
-                <h1 className="city-headline">{weather.name}</h1>
-                <div className="temp-display">
-                  <span className="temp-main">{Math.round(weather.main.temp)}°</span>
-                  <div className="temp-details">
-                    <p className="sub-desc">{weather.weather[0].description}</p>
-                    <p className="sub-range">H: {Math.round(weather.main.temp_max)}° L: {Math.round(weather.main.temp_min)}°</p>
+                
+                <h1 className="city-name">{weather.name}</h1>
+                
+                <div className="main-display">
+                  <div className="icon-wrap">
+                    <img src={getIcon(weather.weather[0].icon)} alt="weather" className="floating-icon" />
+                    <h2 className="big-temp">{Math.round(weather.main.temp)}°</h2>
+                  </div>
+                  <div className="meta-info">
+                    <p className="description">{weather.weather[0].description}</p>
+                    <p className="feels-like">Feels like {Math.round(weather.main.feels_like)}°</p>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              {/* BENTO RESPONSIVE GRID */}
-              <div className="bento-grid">
-                <div className="bento-card">
-                  <label>Wind</label>
-                  <h3>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></h3>
+              {/* BENTO GRID DATA */}
+              <section className="bento-grid">
+                <div className="bento-item">
+                  <label>WIND SPEED</label>
+                  <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
+                  <div className="wind-compass" style={{transform: `rotate(${weather.wind.deg}deg)`}}>↑</div>
                 </div>
-                <div className="bento-card">
-                  <label>Humidity</label>
-                  <h3>{weather.main.humidity}%</h3>
-                  <div className="mini-progress"><div style={{width: `${weather.main.humidity}%`}}></div></div>
+                
+                <div className="bento-item">
+                  <label>HUMIDITY</label>
+                  <p>{weather.main.humidity}%</p>
+                  <div className="progress-bar"><div style={{width: `${weather.main.humidity}%`}}></div></div>
                 </div>
-                <div className="bento-card">
-                  <label>Pressure</label>
-                  <h3>{weather.main.pressure}<span>hPa</span></h3>
+
+                <div className="bento-item">
+                  <label>VISIBILITY</label>
+                  <p>{(weather.visibility / 1000).toFixed(1)} <span>km</span></p>
                 </div>
-                <div className="bento-card">
-                  <label>Visibility</label>
-                  <h3>{(weather.visibility / 1000).toFixed(1)}<span>km</span></h3>
+
+                <div className="bento-item">
+                  <label>PRESSURE</label>
+                  <p>{weather.main.pressure} <span>hPa</span></p>
                 </div>
-              </div>
+              </section>
             </div>
           )}
-        </section>
+        </main>
       </div>
     </div>
   );
