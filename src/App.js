@@ -9,7 +9,7 @@ const API = {
 function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState({});
-  const [units, setUnits] = useState('metric'); // 'metric' for C, 'imperial' for F
+  const [units, setUnits] = useState('metric');
 
   const fetchWeather = (url) => {
     fetch(url)
@@ -20,24 +20,18 @@ function App() {
       });
   }
 
-  // Auto-fetch on load
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((pos) => {
       fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`);
     }, () => {
-      // Fallback to a default city if geolocation is denied
-      fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`);
+      fetchWeather(`${API.base}weather?q=Rajasthan&units=${units}&APPID=${API.key}`);
     });
-  }, [units]); // Refetch when units change
+  }, [units]);
 
   const search = evt => {
     if (evt.key === "Enter" || evt.type === "click") {
       fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`);
     }
-  }
-
-  const toggleUnits = () => {
-    setUnits(units === 'metric' ? 'imperial' : 'metric');
   }
 
   return (
@@ -47,7 +41,7 @@ function App() {
           <input 
             type="text"
             className="search-bar"
-            placeholder="Search city..."
+            placeholder="Search for a city..."
             onChange={e => setQuery(e.target.value)}
             value={query}
             onKeyPress={search}
@@ -56,40 +50,40 @@ function App() {
         </div>
         
         {(typeof weather.main != "undefined") ? (
-        <div className="weather-container animate-fade-in">
-          <div className="location-box">
-            <div className="location">{weather.name}, {weather.sys.country}</div>
-            <button className="unit-toggle" onClick={toggleUnits}>
+        <div className="content-wrapper animate-fade-in">
+          <div className="header-section">
+            <h1 className="location">{weather.name}, {weather.sys.country}</h1>
+            <button className="unit-badge" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
               Switch to {units === 'metric' ? '°F' : '°C'}
             </button>
           </div>
           
-          <div className="weather-box" onClick={toggleUnits} title="Click to toggle units">
-            <div className="temp">
-              {Math.round(weather.main.temp)}°{units === 'metric' ? 'c' : 'f'}
+          <div className="main-card">
+            <div className="temp-section">
+              <span className="current-temp">{Math.round(weather.main.temp)}°</span>
+              <div className="condition">
+                <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
+                <p>{weather.weather[0].description}</p>
+              </div>
             </div>
-            <div className="weather-desc">
-              <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
-              <p>{weather.weather[0].description}</p>
-            </div>
-          </div>
 
-          <div className="extra-info-grid">
-            <div className="info-card">
-              <p>Feels Like</p>
-              <span>{Math.round(weather.main.feels_like)}°</span>
-            </div>
-            <div className="info-card">
-              <p>Humidity</p>
-              <span>{weather.main.humidity}%</span>
-            </div>
-            <div className="info-card">
-              <p>Wind</p>
-              <span>{weather.wind.speed} {units === 'metric' ? 'km/h' : 'mph'}</span>
-            </div>
-            <div className="info-card">
-              <p>Visibility</p>
-              <span>{(weather.visibility / 1000).toFixed(1)} km</span>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <label>FEELS LIKE</label>
+                <p>{Math.round(weather.main.feels_like)}°</p>
+              </div>
+              <div className="stat-item">
+                <label>HUMIDITY</label>
+                <p>{weather.main.humidity}%</p>
+              </div>
+              <div className="stat-item">
+                <label>WIND</label>
+                <p>{weather.wind.speed} {units === 'metric' ? 'km/h' : 'mph'}</p>
+              </div>
+              <div className="stat-item">
+                <label>VISIBILITY</label>
+                <p>{(weather.visibility / 1000).toFixed(1)} km</p>
+              </div>
             </div>
           </div>
         </div>
