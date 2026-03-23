@@ -10,27 +10,33 @@ function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState({});
   const [units, setUnits] = useState('metric');
+  const [history, setHistory] = useState(JSON.parse(localStorage.getItem('searchHistory')) || []);
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Real-time clock effect
+  // Live Clock logic
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const fetchWeather = (url) => {
+  const fetchWeather = (url, cityName) => {
     fetch(url)
       .then(res => {
-        if (!res.ok) throw Error("City not found. Try 'Jaipur' or 'Patna'.");
+        if (!res.ok) throw Error("Location not found");
         return res.json();
       })
       .then(result => {
         setWeather(result);
+        if (cityName && !history.includes(cityName)) {
+          const newHistory = [cityName, ...history.filter(h => h !== cityName)].slice(0, 6);
+          setHistory(newHistory);
+          localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+        }
         setQuery('');
         setError('');
       })
-      .catch(err => setError(err.message));
+      .catch(() => setError("City not found. Try 'Jaipur'"));
   }
 
   useEffect(() => {
@@ -43,74 +49,102 @@ function App() {
   const getGreeting = () => {
     const hour = currentTime.getHours();
     if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
+    if (hour < 18) return "Good Afternoon";
     return "Good Evening";
-  };
+  }
 
-  const getBG = () => {
-    if (!weather.main) return 'app';
-    const tempInC = units === 'metric' ? weather.main.temp : (weather.main.temp - 32) * (5/9);
-    if (tempInC > 30) return 'app hot';
-    const main = weather.weather[0].main.toLowerCase();
-    if (main.includes('cloud')) return 'app cloudy';
-    if (main.includes('rain')) return 'app rainy';
-    if (main.includes('clear')) return 'app sunny';
-    return 'app';
-  };
+  const getThemeClass = () => {
+    if (!weather.main) return 'app-container default';
+    const condition = weather.weather[0].main;
+    if (condition === 'Clear') return 'app-container sun-theme';
+    if (condition === 'Clouds') return 'app-container cloud-theme';
+    if (condition === 'Rain' || condition === 'Drizzle') return 'app-container rain-theme';
+    return 'app-container default';
+  }
 
   return (
-    <div className={getBG()}>
-      <main>
-        <div className="glass-header">
-          <p className="greeting">{getGreeting()}, it's {currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-        </div>
-
-        <div className="search-section">
-          <div className="search-container">
-            <input 
-              type="text" className="search-bar" placeholder="Search city..."
-              onChange={e => setQuery(e.target.value)} value={query}
-              onKeyPress={(e) => e.key === "Enter" && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`)}
-            />
-            <button className="search-btn" onClick={() => fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`)}>Search</button>
-          </div>
-          <div className="suggestions">
-            {['Jaipur', 'Lucknow', 'Patna', 'Delhi'].map(city => (
-              <button key={city} onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>{city}</button>
-            ))}
-          </div>
-        </div>
-
-        {error && <div className="error-box">{error}</div>}
+    <div className={getThemeClass()}>
+      <div className="dashboard-wrapper">
         
-        {weather.main && (
-          <div className="content-wrapper animate-fade-in">
-            <div className="main-card">
-              <div className="card-top">
-                <h1 className="location">{weather.name} <span className="country-tag">{weather.sys.country}</span></h1>
-                <button className="unit-toggle" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
-                  {units === 'metric' ? 'Celsius' : 'Fahrenheit'}
+        {/* LEFT SIDEBAR: History & Branding */}
+        <aside className="glass-sidebar">
+          <div className="brand-zone">
+            <h2>SkyCast<span>.io</span></h2>
+            <p>{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          </div>
+
+          <div className="history-zone">
+            <label>Recent Places</label>
+            <div className="history-list">
+              {history.map((city, i) => (
+                <button key={i} className="history-item" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
+                  <i className="fas fa-map-marker-alt"></i> {city}
                 </button>
-              </div>
-
-              <div className="visual-section">
-                <div className="temp-display">
-                  <span className="big-temp">{Math.round(weather.main.temp)}°</span>
-                  <p className="description">{weather.weather[0].description}</p>
-                </div>
-                <img className="main-icon" src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="weather" />
-              </div>
-
-              <div className="pro-stats">
-                <div className="p-stat"><span>Feels Like</span><p>{Math.round(weather.main.feels_like)}°</p></div>
-                <div className="p-stat"><span>Humidity</span><p>{weather.main.humidity}%</p></div>
-                <div className="p-stat"><span>Wind Speed</span><p>{weather.wind.speed} {units === 'metric' ? 'km/h' : 'mph'}</p></div>
-                <div className="p-stat"><span>Pressure</span><p>{weather.main.pressure} hPa</p></div>
-              </div>
+              ))}
             </div>
           </div>
-        )}
-      </main>
+
+          <div className="sidebar-footer">
+            <button className="unit-toggle-btn" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
+              Switch to {units === 'metric' ? '°F' : '°C'}
+            </button>
+          </div>
+        </aside>
+
+        {/* MAIN CONTENT AREA */}
+        <main className="main-content">
+          <header className="glass-header">
+            <div className="greeting-text">
+              <h3>{getGreeting()}</h3>
+              <p>Explore the world's weather</p>
+            </div>
+            <div className="search-bar-v3">
+              <input 
+                type="text" placeholder="Search another city..." 
+                value={query} onChange={e => setQuery(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
+              />
+              <button onClick={() => fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}>Search</button>
+            </div>
+          </header>
+
+          {error && <div className="error-toast">{error}</div>}
+
+          {weather.main && (
+            <div className="weather-display animate-fade-up">
+              <div className="hero-weather">
+                <div className="hero-text">
+                  <h1 className="main-location">{weather.name}, {weather.sys.country}</h1>
+                  <span className="weather-desc">{weather.weather[0].description}</span>
+                </div>
+                <div className="hero-temp">
+                  <span className="big-degree">{Math.round(weather.main.temp)}°</span>
+                  <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="weather-icon" />
+                </div>
+              </div>
+
+              <div className="data-grid-v3">
+                <div className="glass-tile">
+                  <label>Feels Like</label>
+                  <p>{Math.round(weather.main.feels_like)}°</p>
+                </div>
+                <div className="glass-tile">
+                  <label>Humidity</label>
+                  <p>{weather.main.humidity}%</p>
+                </div>
+                <div className="glass-tile">
+                  <label>Wind Speed</label>
+                  <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
+                </div>
+                <div className="glass-tile">
+                  <label>Pressure</label>
+                  <p>{weather.main.pressure} <span>hPa</span></p>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
