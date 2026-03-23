@@ -194,6 +194,7 @@ main {
   -webkit-text-fill-color: transparent;
 }
 .condition {
+  
   display: flex;
   align-items: center;
   gap: 5px;
