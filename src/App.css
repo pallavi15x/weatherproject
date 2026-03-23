@@ -18,6 +18,18 @@ body { font-family: 'Inter', sans-serif; color: white; background: #000; }
 .app.misty { background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1485236715598-c324a83856a1?auto=format&fit=crop&w=1920&q=80'); }
 .app.snowy { background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1491002052546-bf38f186af56?auto=format&fit=crop&w=1920&q=80'); }
 
+/* Add this new class for extreme heat */
+.app.hot {
+  background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
+    url('https://images.unsplash.com/photo-1504370805625-d32c54b16100?auto=format&fit=crop&w=1920&q=80');
+}
+
+/* Brighten up the cloudy background so it's not so dark */
+.app.cloudy {
+  background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
+    url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1920&q=80');
+}
+
 main {
   min-height: 100vh;
   padding: 40px 20px;

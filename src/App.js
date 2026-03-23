@@ -34,16 +34,20 @@ function App() {
     }
   }
 
-  const getBG = () => {
-    if (!weather.weather) return 'app';
-    const main = weather.weather[0].main.toLowerCase();
-    if (main.includes('cloud')) return 'app cloudy';
-    if (main.includes('rain') || main.includes('drizzle')) return 'app rainy';
-    if (main.includes('clear')) return 'app sunny';
-    if (main.includes('snow')) return 'app snowy';
-    if (main.includes('mist') || main.includes('haze') || main.includes('fog')) return 'app misty';
-    return 'app';
-  }
+ const getBG = () => {
+  if (!weather.main) return 'app';
+  
+  // 1. Priority: If it's very hot (> 30°C), always show a "Heat" background
+  if (weather.main.temp > 30) return 'app hot';
+  
+  // 2. Secondary: Check for specific conditions
+  const main = weather.weather[0].main.toLowerCase();
+  if (main.includes('rain')) return 'app rainy';
+  if (main.includes('cloud')) return 'app cloudy';
+  if (main.includes('clear')) return 'app sunny';
+  
+  return 'app';
+}
 
   return (
     <div className={getBG()}>
