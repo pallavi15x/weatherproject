@@ -1,14 +1,14 @@
 /* ==========================================================================
-   1. CORE SETUP & TYPOGRAPHY
+   POLISHED QUANTUM UI - V2
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;600;800&family=Syncopate:wght@700&display=swap');
 
 :root {
   --neon-blue: #00d2ff;
   --neon-purple: #9d50bb;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --accent-white: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-dim: rgba(255, 255, 255, 0.5);
 }
 
 * {
@@ -18,286 +18,232 @@
 }
 
 body {
-  background: #000;
+  background: #050505; /* Solid deep black for contrast */
   font-family: 'Outfit', sans-serif;
-  overflow: hidden; /* Keeps the app feeling like a single-page OS */
+  color: white;
+  overflow: hidden;
 }
 
 /* ==========================================================================
-   2. IMMERSIVE BACKGROUND (ORBS & NEBULA)
+   DYNAMIC BACKGROUND (Depth Layering)
    ========================================================================== */
 .quantum-container {
   min-height: 100vh;
-  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: radial-gradient(circle at top right, #1a1a2e, #000);
 }
 
-/* Animated Floating Orbs */
 .orb {
   position: absolute;
-  filter: blur(100px);
+  filter: blur(120px);
   border-radius: 50%;
-  z-index: 0;
-  opacity: 0.5;
-  animation: floatOrb 25s infinite alternate ease-in-out;
+  opacity: 0.4;
+  animation: floatOrb 15s infinite alternate ease-in-out;
 }
 
-.orb-1 {
-  width: 500px;
-  height: 500px;
-  background: var(--neon-blue);
-  top: -10%;
-  left: -5%;
-}
-
-.orb-2 {
-  width: 600px;
-  height: 600px;
-  background: var(--neon-purple);
-  bottom: -10%;
-  right: -5%;
-  animation-delay: -7s;
-}
+.orb-1 { width: 500px; height: 500px; background: var(--neon-blue); top: -10%; left: -5%; }
+.orb-2 { width: 400px; height: 400px; background: var(--neon-purple); bottom: 10%; right: 5%; }
 
 @keyframes floatOrb {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(150px, 80px) scale(1.1); }
+  from { transform: translate(0, 0); }
+  to { transform: translate(60px, 40px); }
 }
 
-/* Theme Shifts */
-.day-mode { background: #0a0a0a; }
-.night-mode { background: #000000; }
-.night-mode .orb-1 { background: #1e3a8a; }
-
 /* ==========================================================================
-   3. THE GLASS CANVAS (MAIN WRAPPER)
+   MAIN DASHBOARD CANVAS
    ========================================================================== */
 .glass-canvas {
-  width: 94vw;
-  height: 90vh;
-  background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(40px);
+  width: 96vw;
+  height: 92vh;
+  background: rgba(10, 10, 10, 0.3);
+  backdrop-filter: blur(60px);
   border: 1px solid var(--glass-border);
   border-radius: 40px;
   display: flex;
-  z-index: 10;
-  position: relative;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+  overflow: hidden;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.8);
 }
 
-/* SMART DOCK (Left Side) */
+/* SMART DOCK (Refined Spacing) */
 .smart-dock {
-  width: 90px;
+  width: 100px;
   border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0;
-  gap: 35px;
+  background: rgba(255,255,255,0.02);
 }
 
 .dock-logo {
   font-family: 'Syncopate', sans-serif;
   font-size: 32px;
-  background: linear-gradient(to bottom, #fff, #444);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #fff;
+  margin-bottom: 50px;
+  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.dock-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .dock-btn {
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 18px;
   color: white;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.4s;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dock-btn:hover {
   background: white;
   color: black;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(255,255,255,0.1);
-}
-
-.unit-swap {
-  margin-top: auto;
-  background: transparent;
-  color: var(--neon-blue);
-  border: 1px solid var(--neon-blue);
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-  font-size: 12px;
+  transform: scale(1.1);
 }
 
 /* ==========================================================================
-   4. VIEWPORT & CONTENT
+   MAIN CONTENT VIEWPORT
    ========================================================================== */
 .viewport {
   flex: 1;
-  padding: 60px;
+  padding: 60px 80px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
-/* Search Interface */
 .search-v5 {
-  position: relative;
-  max-width: 550px;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .search-v5 input {
-  width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 2px solid var(--glass-border);
-  padding: 15px 0;
-  font-size: 24px;
+  border-bottom: 1px solid var(--glass-border);
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 0;
+  font-size: 20px;
   color: white;
   outline: none;
-  font-weight: 300;
-  transition: 0.4s;
+  font-weight: 200;
+  transition: 0.3s;
 }
 
 .search-v5 input:focus {
-  border-bottom-color: white;
-  letter-spacing: 1px;
+  border-bottom-color: var(--neon-blue);
+  width: 100%;
 }
 
-/* Hero Data Display */
+/* WEATHER HERO SECTION */
 .badge-row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
 .live-badge {
   background: #ff3b30;
-  color: white;
-  padding: 4px 14px;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 4px 12px;
   border-radius: 50px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
 }
 
 .comfort-badge {
   background: rgba(255,255,255,0.1);
-  padding: 4px 14px;
+  font-size: 10px;
+  padding: 4px 12px;
   border-radius: 50px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
+  color: var(--text-dim);
 }
 
 .city-title {
-  font-size: 72px;
+  font-size: 64px;
   font-weight: 300;
-  margin-bottom: 10px;
-  letter-spacing: -3px;
+  letter-spacing: -2px;
 }
 
 .main-temp-wrap {
   display: flex;
-  align-items: flex-end;
-  gap: 30px;
+  align-items: center;
+  gap: 40px;
+  margin: 10px 0;
 }
 
 .temp-num {
-  font-size: 200px;
+  font-size: 220px;
   font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -12px;
-  font-family: 'Outfit', sans-serif;
+  line-height: 0.85;
+  letter-spacing: -14px;
+  background: linear-gradient(to bottom, #fff 60%, rgba(255,255,255,0.2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.degree-symbol {
-  font-weight: 100;
-  color: rgba(255,255,255,0.2);
-}
-
-.temp-meta p {
-  font-size: 20px;
+.temp-meta .desc-text {
+  font-size: 28px;
   text-transform: capitalize;
-  margin-bottom: 5px;
-}
-
-.range-text {
-  opacity: 0.4;
-  font-weight: 300;
+  font-weight: 200;
+  color: var(--text-dim);
 }
 
 /* ==========================================================================
-   5. BENTO GRID DATA TILES
+   BENTO GRID (The Modern Look)
    ========================================================================== */
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 25px;
   margin-top: auto;
 }
 
 .bento-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--glass-border);
   padding: 30px;
   border-radius: 35px;
-  transition: 0.4s;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .bento-item:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255,255,255,0.06);
   transform: translateY(-10px);
+  border-color: rgba(255,255,255,0.2);
 }
 
 .bento-item label {
   font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
+  color: var(--text-dim);
   letter-spacing: 2px;
-  opacity: 0.4;
-  display: block;
 }
 
 .bento-item p {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 34px;
+  font-weight: 700;
   margin-top: 10px;
 }
 
 .bento-item span {
   font-size: 14px;
-  opacity: 0.4;
-  margin-left: 5px;
-}
-
-.wind-indicator {
-  font-size: 28px;
-  margin-top: 15px;
-  color: var(--neon-blue);
+  color: var(--text-dim);
+  font-weight: 300;
 }
 
 .bar-container {
   width: 100%;
   height: 6px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
   border-radius: 10px;
   margin-top: 20px;
   overflow: hidden;
@@ -305,47 +251,13 @@ body {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(to right, var(--neon-blue), #fff);
+  background: linear-gradient(90deg, var(--neon-blue), #fff);
   border-radius: 10px;
-  transition: width 1s ease-out;
+  box-shadow: 0 0 15px var(--neon-blue);
 }
 
-/* ==========================================================================
-   6. RESPONSIVE OPTIMIZATION
-   ========================================================================== */
-@media (max-width: 1100px) {
+/* RESPONSIVE FIXES */
+@media (max-width: 1200px) {
   .temp-num { font-size: 140px; }
-  .city-title { font-size: 50px; }
   .bento-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-  .glass-canvas {
-    flex-direction: column;
-    height: auto;
-    width: 95vw;
-    margin: 20px 0;
-  }
-  .smart-dock {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    border-right: none;
-    border-bottom: 1px solid var(--glass-border);
-    padding: 20px;
-    justify-content: center;
-  }
-  .viewport { padding: 30px; }
-  .temp-num { font-size: 100px; }
-  .bento-grid { grid-template-columns: 1fr; }
-}
-
-/* Entry Animation */
-.animate-reveal {
-  animation: revealUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes revealUp {
-  from { opacity: 0; transform: translateY(50px); filter: blur(20px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
