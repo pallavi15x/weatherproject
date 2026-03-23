@@ -24,7 +24,7 @@ function App() {
     navigator.geolocation.getCurrentPosition((pos) => {
       fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`);
     }, () => {
-      fetchWeather(`${API.base}weather?q=Rajasthan&units=${units}&APPID=${API.key}`);
+      fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`);
     });
   }, [units]);
 
@@ -34,14 +34,14 @@ function App() {
     }
   }
 
-  // Logic to change background class
   const getBG = () => {
     if (!weather.weather) return 'app';
     const main = weather.weather[0].main.toLowerCase();
     if (main.includes('cloud')) return 'app cloudy';
-    if (main.includes('rain')) return 'app rainy';
+    if (main.includes('rain') || main.includes('drizzle')) return 'app rainy';
     if (main.includes('clear')) return 'app sunny';
-    if (main.includes('mist') || main.includes('haze')) return 'app misty';
+    if (main.includes('snow')) return 'app snowy';
+    if (main.includes('mist') || main.includes('haze') || main.includes('fog')) return 'app misty';
     return 'app';
   }
 
@@ -64,8 +64,9 @@ function App() {
         <div className="content-wrapper animate-fade-in">
           <div className="header-section">
             <h1 className="location">{weather.name}, {weather.sys.country}</h1>
+            <p className="date-display">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
             <button className="unit-badge" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
-              {units === 'metric' ? 'Celsius' : 'Fahrenheit'}
+              {units === 'metric' ? '°C' : '°F'}
             </button>
           </div>
           
@@ -89,11 +90,11 @@ function App() {
               </div>
               <div className="stat-item">
                 <label>WIND</label>
-                <p>{weather.wind.speed} {units === 'metric' ? 'km/h' : 'mph'}</p>
+                <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
               </div>
               <div className="stat-item">
-                <label>VISIBILITY</label>
-                <p>{(weather.visibility / 1000).toFixed(1)} km</p>
+                <label>PRESSURE</label>
+                <p>{weather.main.pressure} <span>hPa</span></p>
               </div>
             </div>
           </div>
