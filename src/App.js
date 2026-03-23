@@ -12,6 +12,7 @@ function App() {
   const [units, setUnits] = useState('metric');
   const [history, setHistory] = useState(JSON.parse(localStorage.getItem('searchHistory')) || []);
   const [error, setError] = useState('');
+  const [alert, setAlert] = useState(null);
 
   const fetchWeather = (url, cityName) => {
     fetch(url)
@@ -29,101 +30,120 @@ function App() {
         setQuery('');
         setError('');
       })
-      .catch(() => setError("Location not found"));
+      .catch(() => setError("Location Error"));
   }
 
+  // Initial Load
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`),
-      () => fetchWeather(`${API.base}weather?q=New York&units=${units}&APPID=${API.key}`)
+      () => fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`)
     );
   }, [units]);
+
+  // Alert System Logic
+  useEffect(() => {
+    if (weather.main) {
+      const temp = weather.main.temp;
+      const condition = weather.weather[0].main.toLowerCase();
+      const wind = weather.wind.speed;
+
+      if (condition.includes("storm") || condition.includes("thunder")) {
+        setAlert({ type: "danger", msg: "Severe Thunderstorm Warning: Seek shelter." });
+      } else if (temp > 38) {
+        setAlert({ type: "warning", msg: "Extreme Heat Wave: Stay hydrated." });
+      } else if (wind > 50) {
+        setAlert({ type: "danger", msg: "High Wind Advisory: Secure loose objects." });
+      } else {
+        setAlert(null); 
+      }
+    }
+  }, [weather]);
 
   const getIcon = (code) => `https://openweathermap.org/img/wn/${code}@4x.png`;
 
   return (
-    <div className="app-container">
-      <div className="dynamic-bg-glow"></div>
+    <div className="app-viewport">
+      <div className="bg-glow"></div>
       
-      <div className="glass-interface">
-        {/* SIDEBAR NAVIGATION */}
-        <aside className="sidebar">
-          <div className="brand-logo">Ω</div>
-          <div className="history-stack">
+      <div className="main-wrapper">
+        <nav className="side-dock">
+          <div className="app-logo">Ω</div>
+          <div className="nav-history">
             {history.map((city, i) => (
-              <button key={i} className="history-btn" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
+              <button key={i} className="nav-item" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
                 {city.charAt(0).toUpperCase()}
               </button>
             ))}
           </div>
-          <button className="unit-fab" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
+          <button className="unit-toggle" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
             {units === 'metric' ? '°C' : '°F'}
           </button>
-        </aside>
+        </nav>
 
-        {/* MAIN DASHBOARD */}
-        <main className="dashboard">
-          <header className="search-section">
-            <div className="input-group">
+        <section className="display-area">
+          {alert && (
+            <div className={`weather-alert-toast ${alert.type} animate-slide-down`}>
+              <span className="alert-icon">⚠️</span>
+              <p>{alert.msg}</p>
+              <button className="close-alert" onClick={() => setAlert(null)}>×</button>
+            </div>
+          )}
+
+          <header className="header-bar">
+            <div className="search-field">
               <input 
-                type="text" placeholder="Explore City..." 
+                type="text" placeholder="Search City..." 
                 value={query} onChange={e => setQuery(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
               />
-              <div className="focus-border"></div>
+              <span className="search-focus-line"></span>
             </div>
-            {error && <p className="error-msg">{error}</p>}
           </header>
 
           {weather.main && (
-            <div className="content-reveal">
-              <section className="hero-weather">
-                <div className="tag-row">
-                  <span className="badge-live">LIVE</span>
-                  <span className="badge-type">{weather.weather[0].main}</span>
+            <div className="data-layout animate-fade">
+              <div className="hero-data">
+                <div className="status-tags">
+                  <span className="tag-live">LIVE</span>
+                  <span className="tag-desc">{weather.weather[0].main}</span>
                 </div>
-                
-                <h1 className="city-name">{weather.name}</h1>
-                
-                <div className="main-display">
-                  <div className="icon-wrap">
+                <h1 className="city-headline">{weather.name}</h1>
+                <div className="temp-display">
+                  <div className="icon-box">
                     <img src={getIcon(weather.weather[0].icon)} alt="weather" className="floating-icon" />
-                    <h2 className="big-temp">{Math.round(weather.main.temp)}°</h2>
+                    <span className="temp-main">{Math.round(weather.main.temp)}°</span>
                   </div>
-                  <div className="meta-info">
-                    <p className="description">{weather.weather[0].description}</p>
-                    <p className="feels-like">Feels like {Math.round(weather.main.feels_like)}°</p>
+                  <div className="temp-details">
+                    <p className="sub-desc">{weather.weather[0].description}</p>
+                    <p className="sub-range">H: {Math.round(weather.main.temp_max)}° L: {Math.round(weather.main.temp_min)}°</p>
                   </div>
                 </div>
-              </section>
+              </div>
 
-              {/* BENTO GRID DATA */}
-              <section className="bento-grid">
-                <div className="bento-item">
-                  <label>WIND SPEED</label>
-                  <p>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></p>
-                  <div className="wind-compass" style={{transform: `rotate(${weather.wind.deg}deg)`}}>↑</div>
+              <div className="bento-grid">
+                <div className="bento-card">
+                  <label>Wind Flow</label>
+                  <h3>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></h3>
+                  <div className="wind-arrow" style={{transform: `rotate(${weather.wind.deg}deg)`}}>↑</div>
                 </div>
-                
-                <div className="bento-item">
-                  <label>HUMIDITY</label>
-                  <p>{weather.main.humidity}%</p>
-                  <div className="progress-bar"><div style={{width: `${weather.main.humidity}%`}}></div></div>
+                <div className="bento-card">
+                  <label>Humidity</label>
+                  <h3>{weather.main.humidity}%</h3>
+                  <div className="mini-progress"><div style={{width: `${weather.main.humidity}%`}}></div></div>
                 </div>
-
-                <div className="bento-item">
-                  <label>VISIBILITY</label>
-                  <p>{(weather.visibility / 1000).toFixed(1)} <span>km</span></p>
+                <div className="bento-card">
+                  <label>Pressure</label>
+                  <h3>{weather.main.pressure}<span>hPa</span></h3>
                 </div>
-
-                <div className="bento-item">
-                  <label>PRESSURE</label>
-                  <p>{weather.main.pressure} <span>hPa</span></p>
+                <div className="bento-card">
+                  <label>Visibility</label>
+                  <h3>{(weather.visibility / 1000).toFixed(1)}<span>km</span></h3>
                 </div>
-              </section>
+              </div>
             </div>
           )}
-        </main>
+        </section>
       </div>
     </div>
   );
