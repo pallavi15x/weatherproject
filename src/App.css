@@ -19,12 +19,16 @@ body { font-family: 'Inter', sans-serif; color: white; background: #000; }
 .app.snowy { background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1491002052546-bf38f186af56?auto=format&fit=crop&w=1920&q=80'); }
 
 /* Add this new class for extreme heat */
+
+/* Add this new class for temperatures above 30°C */
 .app.hot {
   background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
     url('https://images.unsplash.com/photo-1504370805625-d32c54b16100?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
 }
 
-/* Brighten up the cloudy background so it's not so dark */
+/* Also, brighten the cloudy background so it isn't so dark */
 .app.cloudy {
   background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.4)), 
     url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1920&q=80');
