@@ -22,101 +22,96 @@ function App() {
       .then(result => {
         setWeather(result);
         if (cityName && !history.includes(cityName)) {
-          const newHistory = [cityName, ...history.filter(h => h !== cityName)].slice(0, 5);
+          const newHistory = [cityName, ...history.filter(h => h !== cityName)].slice(0, 4);
           setHistory(newHistory);
           localStorage.setItem('searchHistory', JSON.stringify(newHistory));
         }
         setQuery('');
         setError('');
       })
-      .catch(() => setError("Invalid Location"));
+      .catch(() => setError("Location Error"));
   }
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`),
-      () => fetchWeather(`${API.base}weather?q=New York&units=${units}&APPID=${API.key}`)
+      () => fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`)
     );
   }, [units]);
 
   return (
-    <div className="pro-app-container">
-      <div className="orb-bg"></div>
+    <div className="app-viewport">
+      <div className="bg-glow"></div>
       
-      <div className="main-interface glass-morphism">
-        {/* SIDEBAR NAVIGATION */}
-        <aside className="sidebar-nav">
-          <div className="logo-box">Ω</div>
-          <div className="history-dock">
+      <div className="main-wrapper">
+        {/* REFINED SIDEBAR */}
+        <nav className="side-dock">
+          <div className="app-logo">Ω</div>
+          <div className="nav-history">
             {history.map((city, i) => (
-              <button key={i} className="dock-btn" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
+              <button key={i} className="nav-item" onClick={() => fetchWeather(`${API.base}weather?q=${city}&units=${units}&APPID=${API.key}`)}>
                 {city.charAt(0)}
               </button>
             ))}
           </div>
-          <button className="settings-btn" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
+          <button className="unit-toggle" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
             {units === 'metric' ? '°C' : '°F'}
           </button>
-        </aside>
+        </nav>
 
-        {/* CONTENT AREA */}
-        <main className="content-body">
-          <header className="content-header">
-            <div className="search-wrapper">
+        {/* MAIN VIEWPORT */}
+        <section className="display-area">
+          <header className="header-bar">
+            <div className="search-field">
               <input 
-                type="text" placeholder="Jump to City..." 
+                type="text" placeholder="Search City..." 
                 value={query} onChange={e => setQuery(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`, query)}
               />
-              <div className="search-line"></div>
+              <span className="search-focus-line"></span>
             </div>
-            {error && <span className="error-tag">{error}</span>}
           </header>
 
           {weather.main && (
-            <div className="dashboard-content animate-in">
-              <section className="hero-section">
-                <div className="weather-status-row">
-                  <span className="badge red">LIVE</span>
-                  <span className="badge blue">{weather.weather[0].main}</span>
+            <div className="data-layout animate-fade">
+              <div className="hero-data">
+                <div className="status-tags">
+                  <span className="tag-live">LIVE</span>
+                  <span className="tag-desc">{weather.weather[0].main}</span>
                 </div>
-                <h1 className="location-name">{weather.name}</h1>
-                
-                <div className="hero-visual">
-                  <div className="temp-master-box">
-                    <span className="temp-val">{Math.round(weather.main.temp)}°</span>
-                    <div className="temp-sub">
-                      <p className="condition-text">{weather.weather[0].description}</p>
-                      <p className="min-max">H: {Math.round(weather.main.temp_max)}° L: {Math.round(weather.main.temp_min)}°</p>
-                    </div>
+                <h1 className="city-headline">{weather.name}</h1>
+                <div className="temp-display">
+                  <span className="temp-main">{Math.round(weather.main.temp)}°</span>
+                  <div className="temp-details">
+                    <p className="sub-desc">{weather.weather[0].description}</p>
+                    <p className="sub-range">H: {Math.round(weather.main.temp_max)}° L: {Math.round(weather.main.temp_min)}°</p>
                   </div>
                 </div>
-              </section>
+              </div>
 
-              {/* STATS BENTO GRID */}
-              <section className="bento-grid-v2">
-                <div className="grid-card">
-                  <label>WIND FLOW</label>
-                  <div className="card-val">{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></div>
-                  <div className="wind-icon" style={{transform: `rotate(${weather.wind.deg}deg)`}}>↑</div>
+              {/* BENTO RESPONSIVE GRID */}
+              <div className="bento-grid">
+                <div className="bento-card">
+                  <label>Wind</label>
+                  <h3>{weather.wind.speed} <span>{units === 'metric' ? 'km/h' : 'mph'}</span></h3>
                 </div>
-                <div className="grid-card">
-                  <label>HUMIDITY</label>
-                  <div className="card-val">{weather.main.humidity}%</div>
-                  <div className="progress-track"><div className="progress-thumb" style={{width: `${weather.main.humidity}%`}}></div></div>
+                <div className="bento-card">
+                  <label>Humidity</label>
+                  <h3>{weather.main.humidity}%</h3>
+                  <div className="mini-progress"><div style={{width: `${weather.main.humidity}%`}}></div></div>
                 </div>
-                <div className="grid-card">
-                  <label>PRESSURE</label>
-                  <div className="card-val">{weather.main.pressure}<span>hPa</span></div>
+                <div className="bento-card">
+                  <label>Pressure</label>
+                  <h3>{weather.main.pressure}<span>hPa</span></h3>
                 </div>
-                <div className="grid-card">
-                  <label>VISIBILITY</label>
-                  <div className="card-val">{(weather.visibility / 1000).toFixed(1)}<span>km</span></div>
+                <div className="bento-card">
+                  <label>Visibility</label>
+                  <h3>{(weather.visibility / 1000).toFixed(1)}<span>km</span></h3>
                 </div>
-              </section>
+              </div>
             </div>
           )}
-        </main>
+        </section>
       </div>
     </div>
   );
