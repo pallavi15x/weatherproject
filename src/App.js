@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const API_KEY = "fce63951ce2965310ed2e314e200d62f"; 
 
