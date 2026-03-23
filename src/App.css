@@ -193,7 +193,6 @@ main {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .condition {
   display: flex;
   align-items: center;
