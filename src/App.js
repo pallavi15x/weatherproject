@@ -9,35 +9,39 @@ const API = {
 function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState({});
+  const [units, setUnits] = useState('metric'); // 'metric' for C, 'imperial' for F
 
-  // Auto-fetch current location on load
+  const fetchWeather = (url) => {
+    fetch(url)
+      .then(res => res.json())
+      .then(result => {
+        setWeather(result);
+        setQuery('');
+      });
+  }
+
+  // Auto-fetch on load
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((pos) => {
-      fetch(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=metric&APPID=${API.key}`)
-        .then(res => res.json())
-        .then(result => setWeather(result));
+      fetchWeather(`${API.base}weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&units=${units}&APPID=${API.key}`);
+    }, () => {
+      // Fallback to a default city if geolocation is denied
+      fetchWeather(`${API.base}weather?q=London&units=${units}&APPID=${API.key}`);
     });
-  }, []);
+  }, [units]); // Refetch when units change
 
   const search = evt => {
     if (evt.key === "Enter" || evt.type === "click") {
-      fetch(`${API.base}weather?q=${query}&units=metric&APPID=${API.key}`)
-        .then(res => res.json())
-        .then(result => {
-          setWeather(result);
-          setQuery('');
-        });
+      fetchWeather(`${API.base}weather?q=${query}&units=${units}&APPID=${API.key}`);
     }
   }
 
-  const dateBuilder = (d) => {
-    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+  const toggleUnits = () => {
+    setUnits(units === 'metric' ? 'imperial' : 'metric');
   }
 
   return (
-    <div className={(typeof weather.main != "undefined") ? ((weather.main.temp > 16) ? 'app warm' : 'app') : 'app'}>
+    <div className={(typeof weather.main != "undefined") ? ((weather.main.temp > (units === 'metric' ? 16 : 60)) ? 'app warm' : 'app') : 'app'}>
       <main>
         <div className="search-container">
           <input 
@@ -52,44 +56,44 @@ function App() {
         </div>
         
         {(typeof weather.main != "undefined") ? (
-        <div className="weather-container">
+        <div className="weather-container animate-fade-in">
           <div className="location-box">
             <div className="location">{weather.name}, {weather.sys.country}</div>
-            <div className="date">{dateBuilder(new Date())}</div>
+            <button className="unit-toggle" onClick={toggleUnits}>
+              Switch to {units === 'metric' ? '°F' : '°C'}
+            </button>
           </div>
           
-          <div className="weather-box">
+          <div className="weather-box" onClick={toggleUnits} title="Click to toggle units">
             <div className="temp">
-              {Math.round(weather.main.temp)}°c
+              {Math.round(weather.main.temp)}°{units === 'metric' ? 'c' : 'f'}
             </div>
             <div className="weather-desc">
-              <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt="icon" />
-              {weather.weather[0].main}
+              <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
+              <p>{weather.weather[0].description}</p>
             </div>
           </div>
 
           <div className="extra-info-grid">
             <div className="info-card">
               <p>Feels Like</p>
-              <span>{Math.round(weather.main.feels_like)}°c</span>
+              <span>{Math.round(weather.main.feels_like)}°</span>
             </div>
             <div className="info-card">
               <p>Humidity</p>
               <span>{weather.main.humidity}%</span>
             </div>
             <div className="info-card">
-              <p>Wind Speed</p>
-              <span>{weather.wind.speed} km/h</span>
+              <p>Wind</p>
+              <span>{weather.wind.speed} {units === 'metric' ? 'km/h' : 'mph'}</span>
             </div>
             <div className="info-card">
-              <p>Pressure</p>
-              <span>{weather.main.pressure} hPa</span>
+              <p>Visibility</p>
+              <span>{(weather.visibility / 1000).toFixed(1)} km</span>
             </div>
           </div>
         </div>
-        ) : (
-          <div className="loading">Detecting your location...</div>
-        )}
+        ) : null}
       </main>
     </div>
   );
