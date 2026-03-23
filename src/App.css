@@ -161,6 +161,7 @@ body {
   .floating-icon { width: 120px; margin-bottom: -30px; }
   .big-temp { font-size: 120px; letter-spacing: -6px; }
   
+  
   .bento-grid { grid-template-columns: 1fr; gap: 15px; }
   .bento-item { padding: 25px; }
 }
