@@ -1,263 +1,119 @@
-/* ==========================================================================
-   POLISHED QUANTUM UI - V2
-   ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;600;800&family=Syncopate:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap');
 
 :root {
-  --neon-blue: #00d2ff;
-  --neon-purple: #9d50bb;
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --text-dim: rgba(255, 255, 255, 0.5);
+  --accent: #00d2ff;
+  --bg-dark: #08080a;
+  --glass: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: #050505; /* Solid deep black for contrast */
-  font-family: 'Outfit', sans-serif;
+  background: var(--bg-dark);
   color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   overflow: hidden;
 }
 
-/* ==========================================================================
-   DYNAMIC BACKGROUND (Depth Layering)
-   ========================================================================== */
-.quantum-container {
-  min-height: 100vh;
+.pro-app-container {
+  height: 100vh;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  background: radial-gradient(circle at top right, #1a1a2e, #000);
+  background: radial-gradient(circle at top right, #112, #000);
 }
 
-.orb {
+.orb-bg {
   position: absolute;
-  filter: blur(120px);
-  border-radius: 50%;
-  opacity: 0.4;
-  animation: floatOrb 15s infinite alternate ease-in-out;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 210, 255, 0.15) 0%, transparent 70%);
+  filter: blur(80px);
+  top: -100px;
+  left: -100px;
 }
 
-.orb-1 { width: 500px; height: 500px; background: var(--neon-blue); top: -10%; left: -5%; }
-.orb-2 { width: 400px; height: 400px; background: var(--neon-purple); bottom: 10%; right: 5%; }
-
-@keyframes floatOrb {
-  from { transform: translate(0, 0); }
-  to { transform: translate(60px, 40px); }
-}
-
-/* ==========================================================================
-   MAIN DASHBOARD CANVAS
-   ========================================================================== */
-.glass-canvas {
-  width: 96vw;
-  height: 92vh;
-  background: rgba(10, 10, 10, 0.3);
-  backdrop-filter: blur(60px);
-  border: 1px solid var(--glass-border);
+/* MAIN INTERFACE */
+.main-interface {
+  width: 95vw;
+  height: 90vh;
+  background: rgba(15, 15, 20, 0.4);
+  backdrop-filter: blur(50px);
+  border: 1px solid var(--border);
   border-radius: 40px;
   display: flex;
-  overflow: hidden;
-  box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  z-index: 10;
 }
 
-/* SMART DOCK (Refined Spacing) */
-.smart-dock {
-  width: 100px;
-  border-right: 1px solid var(--glass-border);
+/* SIDEBAR */
+.sidebar-nav {
+  width: 90px;
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.01);
 }
 
-.dock-logo {
-  font-family: 'Syncopate', sans-serif;
-  font-size: 32px;
-  color: #fff;
-  margin-bottom: 50px;
-  text-shadow: 0 0 20px rgba(255,255,255,0.3);
-}
+.logo-box { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 50px; }
 
-.dock-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
+.history-dock { display: flex; flex-direction: column; gap: 15px; }
 .dock-btn {
-  width: 54px;
-  height: 54px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 50px; height: 50px; background: var(--glass); border: 1px solid var(--border);
+  border-radius: 16px; color: #fff; font-weight: 700; cursor: pointer; transition: 0.3s;
+}
+.dock-btn:hover { background: #fff; color: #000; transform: scale(1.1); }
+
+.settings-btn {
+  margin-top: auto; background: transparent; border: 1px solid var(--accent);
+  color: var(--accent); padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 12px; cursor: pointer;
 }
 
-.dock-btn:hover {
-  background: white;
-  color: black;
-  transform: scale(1.1);
+/* CONTENT BODY */
+.content-body { flex: 1; padding: 60px 80px; display: flex; flex-direction: column; }
+
+.search-wrapper { position: relative; width: 100%; max-width: 400px; margin-bottom: 40px; }
+.search-wrapper input {
+  width: 100%; background: transparent; border: none; padding: 10px 0;
+  font-size: 18px; color: white; outline: none; font-weight: 200;
+}
+.search-line { height: 1px; background: var(--border); width: 100%; transition: 0.3s; }
+.search-wrapper input:focus + .search-line { background: #fff; box-shadow: 0 0 10px #fff; }
+
+/* HERO SECTION */
+.location-name { font-size: 80px; font-weight: 200; letter-spacing: -4px; margin: 10px 0; }
+
+.temp-master-box { display: flex; align-items: center; gap: 30px; }
+.temp-val { 
+  font-size: 220px; font-weight: 800; line-height: 0.8; letter-spacing: -15px;
+  background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 
-/* ==========================================================================
-   MAIN CONTENT VIEWPORT
-   ========================================================================== */
-.viewport {
-  flex: 1;
-  padding: 60px 80px;
-  display: flex;
-  flex-direction: column;
-}
+.condition-text { font-size: 24px; text-transform: capitalize; font-weight: 200; opacity: 0.6; }
+.min-max { font-size: 16px; opacity: 0.3; font-weight: 400; margin-top: 5px; }
 
-.search-v5 {
-  margin-bottom: 40px;
-}
+/* BENTO GRID */
+.bento-grid-v2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: auto; }
+.grid-card { background: var(--glass); border: 1px solid var(--border); padding: 30px; border-radius: 30px; }
+.grid-card label { font-size: 11px; opacity: 0.4; letter-spacing: 2px; font-weight: 600; }
+.card-val { font-size: 32px; font-weight: 700; margin-top: 10px; }
+.card-val span { font-size: 14px; opacity: 0.3; margin-left: 5px; }
 
-.search-v5 input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--glass-border);
-  width: 100%;
-  max-width: 400px;
-  padding: 10px 0;
-  font-size: 20px;
-  color: white;
-  outline: none;
-  font-weight: 200;
-  transition: 0.3s;
-}
+.progress-track { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+.progress-thumb { height: 100%; background: linear-gradient(90deg, var(--accent), #fff); box-shadow: 0 0 10px var(--accent); }
 
-.search-v5 input:focus {
-  border-bottom-color: var(--neon-blue);
-  width: 100%;
-}
+.wind-icon { font-size: 24px; margin-top: 10px; color: var(--accent); display: inline-block; }
 
-/* WEATHER HERO SECTION */
-.badge-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.badge { font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 50px; margin-right: 10px; }
+.badge.red { background: #ff4757; }
+.badge.blue { background: rgba(255,255,255,0.1); color: var(--accent); border: 1px solid var(--accent); }
 
-.live-badge {
-  background: #ff3b30;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 4px 12px;
-  border-radius: 50px;
-}
-
-.comfort-badge {
-  background: rgba(255,255,255,0.1);
-  font-size: 10px;
-  padding: 4px 12px;
-  border-radius: 50px;
-  color: var(--text-dim);
-}
-
-.city-title {
-  font-size: 64px;
-  font-weight: 300;
-  letter-spacing: -2px;
-}
-
-.main-temp-wrap {
-  display: flex;
-  align-items: center;
-  gap: 40px;
-  margin: 10px 0;
-}
-
-.temp-num {
-  font-size: 220px;
-  font-weight: 800;
-  line-height: 0.85;
-  letter-spacing: -14px;
-  background: linear-gradient(to bottom, #fff 60%, rgba(255,255,255,0.2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.temp-meta .desc-text {
-  font-size: 28px;
-  text-transform: capitalize;
-  font-weight: 200;
-  color: var(--text-dim);
-}
-
-/* ==========================================================================
-   BENTO GRID (The Modern Look)
-   ========================================================================== */
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-  margin-top: auto;
-}
-
-.bento-item {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--glass-border);
-  padding: 30px;
-  border-radius: 35px;
-  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.bento-item:hover {
-  background: rgba(255,255,255,0.06);
-  transform: translateY(-10px);
-  border-color: rgba(255,255,255,0.2);
-}
-
-.bento-item label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-}
-
-.bento-item p {
-  font-size: 34px;
-  font-weight: 700;
-  margin-top: 10px;
-}
-
-.bento-item span {
-  font-size: 14px;
-  color: var(--text-dim);
-  font-weight: 300;
-}
-
-.bar-container {
-  width: 100%;
-  height: 6px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-  margin-top: 20px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--neon-blue), #fff);
-  border-radius: 10px;
-  box-shadow: 0 0 15px var(--neon-blue);
-}
-
-/* RESPONSIVE FIXES */
-@media (max-width: 1200px) {
-  .temp-num { font-size: 140px; }
-  .bento-grid { grid-template-columns: repeat(2, 1fr); }
-}
+/* ANIMATION */
+.animate-in { animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
