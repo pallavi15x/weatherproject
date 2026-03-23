@@ -189,6 +189,7 @@ main {
   line-height: 1;
   letter-spacing: -8px;
   background: linear-gradient(to bottom, #fff, #bbb);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -232,6 +233,53 @@ main {
 
 .stat-item span { font-size: 12px; opacity: 0.5; font-weight: 400; }
 
+/* Weather Tip Box */
+.weather-tip-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 30px;
+  border-left: 4px solid #fff;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+  text-align: left;
+}
+
+/* Forecast Overview */
+.forecast-preview {
+  margin-top: 40px;
+  text-align: left;
+}
+
+.forecast-preview h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+
+.forecast-days {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.f-day {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px 10px;
+  border-radius: 20px;
+  flex: 1;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: 0.3s;
+}
+
+.f-day:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-5px);
+}
 /* ==========================================================================
    5. RESPONSIVE ENGINE
    ========================================================================== */

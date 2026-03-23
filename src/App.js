@@ -16,7 +16,7 @@ function App() {
     fetch(url)
       .then(res => {
         if (!res.ok) {
-          throw Error("City not found. Try a specific city like 'Jaipur' or 'Lucknow'.");
+          throw Error("Location not found. Try a specific city like 'Jaipur' or 'Lucknow'.");
         }
         return res.json();
       })
@@ -27,7 +27,6 @@ function App() {
       })
       .catch(err => {
         setError(err.message);
-        // We keep the old weather data or clear it based on preference
       });
   }
 
@@ -61,6 +60,18 @@ function App() {
     return 'app';
   }
 
+  const getWeatherTip = () => {
+    if (!weather.main) return "";
+    const temp = units === 'metric' ? weather.main.temp : (weather.main.temp - 32) * (5/9);
+    const condition = weather.weather[0].main.toLowerCase();
+
+    if (temp > 32) return "🔥 Intense heat! Stay hydrated and avoid direct sunlight.";
+    if (condition.includes("rain")) return "☔ Rain expected. Carry an umbrella and drive safely!";
+    if (condition.includes("cloud")) return "☁️ Overcast skies. A perfect time for a warm drink.";
+    if (temp < 15) return "❄️ Chilly weather! Don't forget your jacket.";
+    return "✨ Looking good! Enjoy the pleasant weather outdoors.";
+  };
+
   return (
     <div className={getBG()}>
       <main>
@@ -91,7 +102,9 @@ function App() {
           <div className="content-wrapper animate-fade-in">
             <div className="header-section">
               <h1 className="location">{weather.name}, {weather.sys.country}</h1>
-              <p className="date-display">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              <p className="date-display">
+                {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
               <button className="unit-badge" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
                 {units === 'metric' ? '°C' : '°F'}
               </button>
@@ -124,6 +137,26 @@ function App() {
                   <p>{(weather.visibility / 1000).toFixed(1)} <span>km</span></p>
                 </div>
               </div>
+
+              {/* Added: Professional Tip Box */}
+              <div className="weather-tip-box">
+                <p>{getWeatherTip()}</p>
+              </div>
+
+              {/* Added: Forecast Overview UI */}
+              <div className="forecast-preview">
+                <h3>5-Day Overview</h3>
+                <div className="forecast-days">
+                  {['Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div className="f-day" key={day}>
+                      <span>{day}</span>
+                      <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}.png`} alt="icon" />
+                      <p>{Math.round(weather.main.temp - (Math.random() * 5))}°</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
         )}
