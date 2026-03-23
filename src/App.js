@@ -34,14 +34,25 @@ function App() {
     }
   }
 
+  // Logic to change background class
+  const getBG = () => {
+    if (!weather.weather) return 'app';
+    const main = weather.weather[0].main.toLowerCase();
+    if (main.includes('cloud')) return 'app cloudy';
+    if (main.includes('rain')) return 'app rainy';
+    if (main.includes('clear')) return 'app sunny';
+    if (main.includes('mist') || main.includes('haze')) return 'app misty';
+    return 'app';
+  }
+
   return (
-    <div className={(typeof weather.main != "undefined") ? ((weather.main.temp > (units === 'metric' ? 16 : 60)) ? 'app warm' : 'app') : 'app'}>
+    <div className={getBG()}>
       <main>
         <div className="search-container">
           <input 
             type="text"
             className="search-bar"
-            placeholder="Search for a city..."
+            placeholder="Search city..."
             onChange={e => setQuery(e.target.value)}
             value={query}
             onKeyPress={search}
@@ -49,12 +60,12 @@ function App() {
           <button className="search-btn" onClick={search}>Search</button>
         </div>
         
-        {(typeof weather.main != "undefined") ? (
+        {weather.main && (
         <div className="content-wrapper animate-fade-in">
           <div className="header-section">
             <h1 className="location">{weather.name}, {weather.sys.country}</h1>
             <button className="unit-badge" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>
-              Switch to {units === 'metric' ? '°F' : '°C'}
+              {units === 'metric' ? 'Celsius' : 'Fahrenheit'}
             </button>
           </div>
           
@@ -62,7 +73,7 @@ function App() {
             <div className="temp-section">
               <span className="current-temp">{Math.round(weather.main.temp)}°</span>
               <div className="condition">
-                <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
+                <img className="weather-icon" src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`} alt="icon" />
                 <p>{weather.weather[0].description}</p>
               </div>
             </div>
@@ -87,7 +98,7 @@ function App() {
             </div>
           </div>
         </div>
-        ) : null}
+        )}
       </main>
     </div>
   );
