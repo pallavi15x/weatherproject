@@ -194,7 +194,6 @@ main {
   -webkit-text-fill-color: transparent;
 }
 .condition {
-  
   display: flex;
   align-items: center;
   gap: 5px;
@@ -203,7 +202,7 @@ main {
   text-transform: capitalize;
 }
 
-/* Stats Grid */
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
